@@ -15,13 +15,16 @@ carImg.src = "./images/car.png";
 /* window.onload = () => {
   ctx.drawImage(carImg, car.x, car.y, 50, 70);
 }; */
+function getRandom(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 class blocksC {
   constructor(width, height) {
-    this.x = Math.random() * myCanvas.width;
+    this.x = 30+getRandom(10,400);
     this.y = 0;
-    this.widht = Math.random() * 200;
-    this.height = Math.random() * 70;
+    this.widht = getRandom(50,200);
+    this.height = getRandom(10, 80);
   }
 
   draw() {
@@ -34,7 +37,8 @@ class blocksC {
   }
 }
 
-let c=0
+let score=0 
+let c = 0;
 class carC {
   constructor(x, y) {
     this.x = x;
@@ -57,7 +61,6 @@ let car = new carC(225, 600);
 //let block = new blocksC(100, 50,)
 blocks.push(new blocksC(100, 50));
 
-
 window.onload = () => {
   document.getElementById("start-button").onclick = () => {
     startGame();
@@ -65,6 +68,7 @@ window.onload = () => {
 };
 
 let counter = 0;
+let level= 3;
 
 function startGame() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -83,34 +87,44 @@ function startGame() {
     counter++;
     ctx.drawImage(road, 0, 0, 500, 700);
     car.draw();
-      if (Math.random() * 1000 <= 5) {
+    if (Math.random() * 1000 <= level) {
       blocks.push(new blocksC(100, 50));
-    }  
+    }
     for (bb of blocks) {
       bb.move();
       bb.draw();
-      
-      if ( car.x-3< bb.x+bb.widht/2 && car.x+3>bb.x-bb.widht/2 && car.y-17 >bb.y-(bb.height/2) && car.y-17< (bb.y)+(bb.height/2) ) {
-        console.log("HIT HIT HIT")
-        clearInterval(interval)
-        console.log("BLOCKS",bb.x,bb.y)
-        console.log("CAR",car.x, car.y)
-        console.log(car.x)
-        console.log(car.x+3)
-        console.log(car.x-3)
-        console.log(bb.x)
-        console.log(bb.widht)
-        console.log(bb.widht/2)
-        console.log((bb.x+bb.widht/2))
-        console.log(bb.x-bb.widht/2)
 
+      if (
+        (
+          car.x > bb.x && car.x < bb.x + bb.widht ||
+          car.x < bb.x && car.x + 50 > bb.x + bb.widht ||
+          car.x + 50 > bb.x && car.x + 50 < bb.x + bb.widht
+        )&&(
+          (car.y > bb.y && car.y < bb.y + bb.height) ||
+            (car.y + 70 > bb.y && car.y + 70 < bb.y + bb.height) ||
+            (car.y < bb.y && car.y + 70 > bb.y + bb.height)
+        ) 
+      ) {
+        console.log("HIT HIT HIT");
+        gameOver()
+        clearInterval(interval);
       }
-      if (c%100 ==0){
-        console.log("BLOCKS",bb.x,bb.x-bb.widht/2, bb.x+bb.widht/2 )
-        console.log("CAR",car.x, car.y)
+      if (car.x<=30 ||car.x+50 >=465) {
+        gameOver()
+        
+        clearInterval(interval);}
+      if (c % 100000 == 0) {
+        level++
       }
+      if (c % 1000 == 0) {
+        score++
+      }
+
     }
-    c++
+    c++;
+    ctx.fillStyle = 'orange';
+    ctx.font = '40px Arial';  
+    ctx.strokeText("Your score is " +score, 150, 50)
 
     let x = Math.floor(Math.random() * 100 + 1);
 
@@ -118,7 +132,18 @@ function startGame() {
   }, 1000 / 60);
 }
 
+function gameOver(){
+  ctx.fillStyle ='black'
+  ctx.fillRect(0,0 , 500, 700)
+  ctx.fillStyle ='purple'
+  
 
+  ctx.fillText("You failed as usual!!", 50, 350)
+  clearInterval(interval)
+  blocks=[1,2,3]
+
+
+}
 
 /* 
 const imageURL = ["./images/road.png","./images/car.png"];
